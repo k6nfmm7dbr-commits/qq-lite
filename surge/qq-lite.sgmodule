@@ -1,0 +1,71 @@
+#!name=QQ 瘦身 · QQ Lite
+#!desc=拦截 QQ 的腾讯广告域名与埋点上报，减少开屏广告等待与空间 / 看点信息流广告加载。零 MITM、零证书。
+#!author=Minis
+#!icon=https://raw.githubusercontent.com/k6nfmm7dbr-commits/qq-lite/main/icon.png
+#!category=去广告
+#!tag=去广告,QQ,腾讯
+#!homepage=https://github.com/k6nfmm7dbr-commits/qq-lite
+#!openUrl=https://apps.apple.com/cn/app/id444934666
+#!date=2026-10-06
+# ------------------------------------------------------------
+# Surge 格式模块。Egern / Surge / Loon / Stash / Shadowrocket
+# 均可直接导入（Egern 官方支持 Surge 模块）。
+#
+# 需要转换到其它客户端？把本文件的 raw 链接丢进 Script-Hub：
+#   https://script-hub.nfdns.top
+#
+# 为什么不需要进阶版：
+#   QQ 的广告走的是腾讯自建的独立广告域（ad.qq.com、adsview.qq.com、
+#   adsmind.*、gdt.qq.com 这一批），这些域在 QQ 里只干广告，域名层
+#   就能干净拦掉，不需要 MITM 去看路径。零 MITM 也意味着零额外 CPU。
+#
+# ⚠️ 故意不碰：qzonestyle.gtimg.cn（空间样式）、imgcache.qq.com
+#    （空间图片）、r.inews.qq.com（看点内容）—— 拦了空间/看点会异常。
+#
+# ⚠️ 本模块的 [Rule] 会合并进你的规则列表。请确认它排在更宽泛的
+#    qq.com 直连规则之前，否则不会生效。
+# ------------------------------------------------------------
+
+[Rule]
+
+# ── 腾讯广告体系：广点通 / 优量汇 ──
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+DOMAIN-SUFFIX,pgdt.gtimg.cn,REJECT
+DOMAIN-SUFFIX,pgdt.ugdtimg.com,REJECT
+DOMAIN-SUFFIX,e.qq.com,REJECT
+DOMAIN-SUFFIX,l.qq.com,REJECT
+
+# ── 腾讯自有广告投放 / 素材 / 监测 ──
+DOMAIN-SUFFIX,ad.qq.com,REJECT
+DOMAIN-SUFFIX,adnet.qq.com,REJECT
+DOMAIN-SUFFIX,adping.qq.com,REJECT
+DOMAIN-SUFFIX,adsclick.qq.com,REJECT
+DOMAIN-SUFFIX,adsfile.qq.com,REJECT
+DOMAIN-SUFFIX,adsgroup.qq.com,REJECT
+DOMAIN-SUFFIX,adshmct.qq.com,REJECT
+DOMAIN-SUFFIX,adshmmsg.qq.com,REJECT
+DOMAIN-SUFFIX,adslvfile.qq.com,REJECT
+DOMAIN-SUFFIX,adslvseed.qq.com,REJECT
+DOMAIN-SUFFIX,adsqqclick.qq.com,REJECT
+DOMAIN-SUFFIX,adsrich.qq.com,REJECT
+DOMAIN-SUFFIX,adstextview.qq.com,REJECT
+DOMAIN-SUFFIX,adsview.qq.com,REJECT
+DOMAIN-SUFFIX,adsview2.qq.com,REJECT
+DOMAIN-SUFFIX,ads.privacy.qq.com,REJECT
+DOMAIN-SUFFIX,adsmind.apdcdn.tc.qq.com,REJECT
+DOMAIN-SUFFIX,adsmind.gdtimg.com.tcdn.qq.com,REJECT
+DOMAIN-SUFFIX,adsmind.ugdtimg.com.tcdn.qq.com,REJECT
+DOMAIN-SUFFIX,ads-acc.qqbrowser.qq.com,REJECT
+DOMAIN-SUFFIX,adfilter.imtt.qq.com,REJECT
+DOMAIN-SUFFIX,advert-prod.hyrz.qq.com,REJECT
+
+# ── 埋点 / 统计 / 崩溃上报（对内存帮助很小，介意可注释掉）──
+DOMAIN-SUFFIX,beacon.qq.com,REJECT
+DOMAIN-SUFFIX,beaconcdn.qq.com,REJECT
+DOMAIN,beacon.cdn.qq.com,REJECT
+DOMAIN-SUFFIX,pingjs.qq.com,REJECT
+DOMAIN-SUFFIX,sngmta.qq.com,REJECT
+DOMAIN-SUFFIX,mtrace.qq.com,REJECT
+DOMAIN-SUFFIX,trace.qq.com,REJECT
+DOMAIN-SUFFIX,statistic.qzone.qq.com,REJECT
+DOMAIN-SUFFIX,snowflake.qq.com,REJECT

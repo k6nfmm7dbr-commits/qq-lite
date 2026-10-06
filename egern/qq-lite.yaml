@@ -1,0 +1,174 @@
+# ============================================================
+#  QQ 瘦身 · QQ Lite
+#  ----------------------------------------------------------
+#  作用：拦截 QQ（com.tencent.mqq）的腾讯广告域名与埋点上报，
+#        减少开屏广告等待、QQ 空间 / 看点信息流广告加载和后台
+#        统计开销。
+#
+#  特性：零 MITM、零证书、零脚本 —— 只有域名规则。
+#
+#  为什么不需要进阶版：
+#    和抖音、红果不一样，QQ 的广告**走的是腾讯自建的独立广告域**
+#    （ad.qq.com、adsview.qq.com、adsmind.*、gdt.qq.com 这一批），
+#    这些域在 QQ 里**只干广告**，域名层就能干净地拦掉，
+#    不需要解密流量去看路径。
+#    不做 MITM 也意味着零额外 CPU 开销 —— 对卡顿的机器更友好。
+#
+#  ⚠️ 规则顺序：客户端从上到下匹配第一条命中的规则。若你的主配置
+#     里有更靠前的宽泛规则（如 DOMAIN-SUFFIX,qq.com,DIRECT），
+#     会抢先命中导致本模块失效。请把本模块规则置于其之前。
+#     验证：请求记录 → 打开 QQ → 看是否显示 REJECT。
+#
+#  ⚠️ 故意不碰的：qzonestyle.gtimg.cn（QQ 空间样式/脚本）、
+#     imgcache.qq.com（空间图片 CDN）、r.inews.qq.com（看点内容）
+#     —— 这些是正常内容，拦了空间/看点会显示异常。
+#
+#  域名清单交叉验证自 adblockdnslite（217heidai/adblockfilters）、
+#  EasyPrivacy（blackmatrix7 镜像）、AdGuard Mobile Ads filter。
+# ============================================================
+
+name: "QQ 瘦身 · QQ Lite"
+description: "拦截 QQ 的腾讯广告域名与埋点上报，减少开屏广告等待与空间 / 看点信息流广告加载。零 MITM、零证书。"
+author: "Minis"
+homepage: "https://github.com/k6nfmm7dbr-commits/qq-lite"
+manual: "https://github.com/k6nfmm7dbr-commits/qq-lite#readme"
+icon: "https://raw.githubusercontent.com/k6nfmm7dbr-commits/qq-lite/main/icon.png"
+open_url: "https://apps.apple.com/cn/app/id444934666"
+
+
+rules:
+
+  # ── 腾讯广告体系：广点通 / 优量汇 ───────────────────────
+  # QQ、QQ 空间、看点、腾讯新闻共用同一套广告投放系统。
+  # gdt.qq.com 一条后缀就覆盖了 mi./win./c./v./s./c2./canvas-cdn. 等子域；
+  # l.qq.com 覆盖 c.l. / c2.l. / cm.l. 等点击上报域。
+  - domain_suffix:
+      match: "gdt.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "pgdt.gtimg.cn"          # 广告素材 CDN
+      policy: REJECT
+  - domain_suffix:
+      match: "pgdt.ugdtimg.com"       # 同上，另一条素材 CDN
+      policy: REJECT
+  - domain_suffix:
+      match: "e.qq.com"               # 曝光上报（sdk.e. / tangram.e.）
+      policy: REJECT
+  - domain_suffix:
+      match: "l.qq.com"               # 点击上报
+      policy: REJECT
+
+  # ── 腾讯自有广告投放 / 素材 / 监测 ──────────────────────
+  # 这一组是腾讯广告系统在 *.qq.com 下的一批专用域，
+  # 名字都以 ad 开头，且没有正常业务混在里面（已核对过完整列表）。
+  - domain_suffix:
+      match: "ad.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adnet.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adping.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adsclick.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adsfile.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adsgroup.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adshmct.qq.com"         # H5 广告位
+      policy: REJECT
+  - domain_suffix:
+      match: "adshmmsg.qq.com"        # H5 广告位
+      policy: REJECT
+  - domain_suffix:
+      match: "adslvfile.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adslvseed.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adsqqclick.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adsrich.qq.com"         # 富媒体广告素材
+      policy: REJECT
+  - domain_suffix:
+      match: "adstextview.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adsview.qq.com"         # 广告监测
+      policy: REJECT
+  - domain_suffix:
+      match: "adsview2.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "ads.privacy.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adsmind.apdcdn.tc.qq.com"           # 广告投放
+      policy: REJECT
+  - domain_suffix:
+      match: "adsmind.gdtimg.com.tcdn.qq.com"     # 广告素材
+      policy: REJECT
+  - domain_suffix:
+      match: "adsmind.ugdtimg.com.tcdn.qq.com"
+      policy: REJECT
+  # 以下三条来自 QQ 内置浏览器 / 腾讯浏览服务（TBS）的广告位。
+  # QQ 里很多页面是 WebView 渲染的，所以一并拦掉。
+  - domain_suffix:
+      match: "ads-acc.qqbrowser.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "adfilter.imtt.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "advert-prod.hyrz.qq.com"
+      policy: REJECT
+
+  # ── 埋点 / 统计 / 崩溃上报 ──────────────────────────────
+  # 对内存帮助很小（省一点网络与后台线程），风险也低。
+  # 介意就整段注释掉。
+  - domain_suffix:
+      match: "beacon.qq.com"          # 灯塔埋点（覆盖 otheve./aeventlog./astrategy.）
+      policy: REJECT
+  - domain_suffix:
+      match: "beaconcdn.qq.com"
+      policy: REJECT
+  - domain:
+      match: "beacon.cdn.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "pingjs.qq.com"          # 腾讯 H5 统计
+      policy: REJECT
+  - domain_suffix:
+      match: "sngmta.qq.com"          # 腾讯移动分析 MTA
+      policy: REJECT
+  - domain_suffix:
+      match: "mtrace.qq.com"          # 移动端 trace
+      policy: REJECT
+  - domain_suffix:
+      match: "trace.qq.com"
+      policy: REJECT
+  - domain_suffix:
+      match: "statistic.qzone.qq.com" # QQ 空间统计
+      policy: REJECT
+  - domain_suffix:
+      match: "snowflake.qq.com"
+      policy: REJECT
+
+
+# ── 故意没做的事 ────────────────────────────────────────────
+# ✗ 拦 qzonestyle.gtimg.cn → QQ 空间的样式和脚本，拦了空间直接白屏
+# ✗ 拦 imgcache.qq.com / qpic.cn → 空间和头像的图片 CDN，拦了全是裂图
+# ✗ 拦 r.inews.qq.com / news.ssp.qq.com → 看点内容源，拦了看点没内容
+#   （news.ssp.qq.com 确实带 SSP 字样，但它同时供内容，不做默认拦截）
+# ✗ 拦 qq.com 主域 → QQ 直接打不开
+# ✗ 拦文件传输 / 语音视频 / QQ 钱包相关域 → 核心功能
+# ✗ 用脚本改客户端配置去精简界面
+#   → 那是 UI 精简不是省内存，而且依赖会随版本变的结构。
+#     想要界面精简请用社区那类模块，别和去广告混在一起。
